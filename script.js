@@ -114,10 +114,21 @@ function createCountdownTimer({ display, minuteInput, secondInput, completionMes
     syncFromInputs();
   }
 
+  function onWheel(event, input, min, max) {
+    if (inputsLocked) return;
+    event.preventDefault();
+    const currentValue = Number.parseInt(input.value, 10) || 0;
+    const delta = event.deltaY < 0 ? 1 : -1;
+    input.value = clamp(currentValue + delta, min, max);
+    onInputChange();
+  }
+
   minuteInput.addEventListener('input', onInputChange);
   secondInput.addEventListener('input', onInputChange);
   minuteInput.addEventListener('change', onInputChange);
   secondInput.addEventListener('change', onInputChange);
+  minuteInput.addEventListener('wheel', (e) => onWheel(e, minuteInput, 0, 599), { passive: false });
+  secondInput.addEventListener('wheel', (e) => onWheel(e, secondInput, 0, 59), { passive: false });
 
   syncFromInputs();
 
