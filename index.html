@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TempTimer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="app__header">
+        <h1 class="app__title">TempTimer</h1>
+        <p class="app__subtitle">A simple up &amp; down count timer</p>
+      </header>
+
+      <section class="timer" aria-live="polite">
+        <div class="timer__mode" role="status">
+          <span id="modeLabel">Counting up</span>
+        </div>
+        <div class="timer__display" id="timeDisplay" aria-label="Timer">
+          00 : 00
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Timer controls">
+        <div class="controls__group">
+          <label class="controls__label" for="minutesInput">Minutes</label>
+          <input
+            id="minutesInput"
+            class="controls__input"
+            type="number"
+            min="0"
+            max="599"
+            value="1"
+            inputmode="numeric"
+          />
+        </div>
+        <div class="controls__group">
+          <label class="controls__label" for="secondsInput">Seconds</label>
+          <input
+            id="secondsInput"
+            class="controls__input"
+            type="number"
+            min="0"
+            max="59"
+            value="0"
+            inputmode="numeric"
+          />
+        </div>
+      </section>
+
+      <div class="buttons">
+        <button class="button button--primary" id="startStopButton" type="button">
+          Start
+        </button>
+        <button class="button" id="resetButton" type="button">Reset</button>
+        <button class="button" id="directionButton" type="button" aria-pressed="false">
+          Switch to Countdown
+        </button>
+      </div>
+    </main>
+
+    <template id="toastTemplate">
+      <div class="toast" role="status" aria-live="assertive"></div>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
