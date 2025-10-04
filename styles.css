@@ -29,7 +29,7 @@ body {
 .app {
   background: linear-gradient(145deg, var(--surface), var(--surface-alt));
   border-radius: 1.75rem;
-  width: min(720px, 100%);
+  width: min(480px, 100%);
   padding: clamp(1.5rem, 4vw, 2.5rem);
   box-shadow: 0 20px 60px rgb(0 0 0 / 0.35);
   display: flex;
@@ -52,56 +52,35 @@ body {
   font-size: 0.95rem;
 }
 
-.timers {
+.timer {
   display: grid;
-  gap: 1.25rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.timer-card {
-  background: rgb(255 255 255 / 0.04);
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.05);
-}
-
-.timer-card__header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.timer-card__title {
-  margin: 0;
-  font-size: 1.35rem;
-}
-
-.timer-card__subtitle {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-.timer-card__display {
-  font-size: clamp(3rem, 10vw, 4rem);
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  gap: 0.5rem;
   text-align: center;
 }
 
-.timer-card__inputs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.75rem;
+.timer__mode {
+  font-size: 0.95rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.timer-card__field {
+.timer__display {
+  font-size: clamp(3.5rem, 14vw, 4.5rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.controls {
   display: grid;
-  gap: 0.35rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.controls__group {
+  display: grid;
+  gap: 0.25rem;
 }
 
 .controls__label {
@@ -128,9 +107,10 @@ body {
   background: rgb(255 255 255 / 0.1);
 }
 
-.controls__input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
 }
 
 .button {
@@ -173,13 +153,6 @@ body {
 .button--running:hover,
 .button--running:focus-visible {
   background: linear-gradient(135deg, var(--primary), #818cf8);
-}
-
-.sequence-controls {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  margin-top: 0.25rem;
 }
 
 .toast-container {
@@ -238,7 +211,11 @@ body {
     padding: 1.75rem 1.25rem;
   }
 
-  .sequence-controls {
-    flex-direction: column;
+  .timer__display {
+    font-size: clamp(2.8rem, 20vw, 3.8rem);
+  }
+
+  .buttons {
+    grid-template-columns: 1fr;
   }
 }
