@@ -1,18 +1,7 @@
-const display = document.getElementById('timeDisplay');
-const startStopButton = document.getElementById('startStopButton');
-const resetButton = document.getElementById('resetButton');
-const directionButton = document.getElementById('directionButton');
-const minutesInput = document.getElementById('minutesInput');
-const secondsInput = document.getElementById('secondsInput');
-const modeLabel = document.getElementById('modeLabel');
-const toastTemplate = document.getElementById('toastTemplate');
++267
+-0
 
-let isRunning = false;
-let timerId = null;
-let direction = 'up'; // 'up' or 'down'
-let baseElapsed = 0; // milliseconds already elapsed before current run
-let lastTick = null;
-let countdownCompleted = false;
+const toastTemplate = document.getElementById('toastTemplate');
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -29,20 +18,6 @@ function formatTime(milliseconds) {
   }
 
   return [minutes, seconds].map((part) => String(part).padStart(2, '0')).join(' : ');
-}
-
-function getCountdownStartMs() {
-  const minutes = clamp(Number.parseInt(minutesInput.value, 10) || 0, 0, 599);
-  const seconds = clamp(Number.parseInt(secondsInput.value, 10) || 0, 0, 59);
-  return (minutes * 60 + seconds) * 1000;
-}
-
-function setCountdownInputs(milliseconds) {
-  const totalSeconds = Math.floor(milliseconds / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  minutesInput.value = minutes;
-  secondsInput.value = seconds;
 }
 
 function createToast(message, { variant = 'default', timeout = 2500 } = {}) {
@@ -74,138 +49,222 @@ function createToast(message, { variant = 'default', timeout = 2500 } = {}) {
   }, timeout);
 }
 
-function updateDisplay() {
-  if (direction === 'up') {
-    display.textContent = formatTime(baseElapsed);
+function createTicker(callback) {
+  let isRunning = false;
+  let lastTick = null;
+  let rafId = null;
+
+  function tick() {
+    if (!isRunning) {
+      return;
+    }
+
+    const now = Date.now();
+    const delta = now - lastTick;
+    lastTick = now;
+    callback(delta);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  return {
+    start() {
+      if (isRunning) return;
+      isRunning = true;
+      lastTick = Date.now();
+      rafId = requestAnimationFrame(tick);
+    },
+    stop() {
+      if (!isRunning) return;
+      isRunning = false;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    },
+  };
+}
+
+function createCountdownTimer({ display, minuteInput, secondInput, completionMessage }) {
+  let duration = 0;
+  let remaining = 0;
+  let inputsLocked = false;
+
+  function sanitizeInputs() {
+    const minutes = clamp(Number.parseInt(minuteInput.value, 10) || 0, 0, 599);
+    const seconds = clamp(Number.parseInt(secondInput.value, 10) || 0, 0, 59);
+
+    minuteInput.value = minutes;
+    secondInput.value = seconds;
+
+    return (minutes * 60 + seconds) * 1000;
+  }
+
+  function updateDisplay() {
+    display.textContent = formatTime(remaining);
+  }
+
+  function syncFromInputs() {
+    duration = sanitizeInputs();
+    remaining = duration;
+    updateDisplay();
+  }
+
+  function onInputChange() {
+    if (inputsLocked) return;
+    syncFromInputs();
+  }
+
+  minuteInput.addEventListener('input', onInputChange);
+  secondInput.addEventListener('input', onInputChange);
+  minuteInput.addEventListener('change', onInputChange);
+  secondInput.addEventListener('change', onInputChange);
+
+  syncFromInputs();
+
+  return {
+    captureDuration() {
+      syncFromInputs();
+      return duration;
+    },
+    tick(delta) {
+      if (remaining <= 0) {
+        return true;
+      }
+
+      remaining = Math.max(0, remaining - delta);
+      updateDisplay();
+      return remaining === 0;
+    },
+    resetToInputs() {
+      syncFromInputs();
+    },
+    lockInputs(locked) {
+      inputsLocked = locked;
+      minuteInput.disabled = locked;
+      secondInput.disabled = locked;
+    },
+    get duration() {
+      return duration;
+    },
+    completionMessage,
+  };
+}
+
+const heatTimer = createCountdownTimer({
+  display: document.getElementById('heatDisplay'),
+  minuteInput: document.getElementById('heatMinutes'),
+  secondInput: document.getElementById('heatSeconds'),
+  completionMessage: 'Heat up complete! Starting cool down.',
+});
+
+const coolTimer = createCountdownTimer({
+  display: document.getElementById('coolDisplay'),
+  minuteInput: document.getElementById('coolMinutes'),
+  secondInput: document.getElementById('coolSeconds'),
+  completionMessage: 'Cool down complete! All done.',
+});
+
+const timers = [heatTimer, coolTimer];
+const sequenceToggle = document.getElementById('sequenceToggle');
+
+const ticker = createTicker(handleTick);
+let activeTimerIndex = null;
+let running = false;
+
+function handleTick(delta) {
+  if (activeTimerIndex === null) {
     return;
   }
 
-  const remaining = Math.max(0, getCountdownStartMs() - baseElapsed);
-  display.textContent = formatTime(remaining);
+  const timer = timers[activeTimerIndex];
+  const finished = timer.tick(delta);
+
+  if (!finished) {
+    return;
+  }
+
+  if (timer.completionMessage) {
+    createToast(timer.completionMessage, { timeout: 3000 });
+  }
+
+  const nextIndex = timers.findIndex((candidate, index) => {
+    if (index <= activeTimerIndex) return false;
+    return candidate.duration > 0;
+  });
+
+  if (nextIndex === -1) {
+    finishSequence();
+    return;
+  }
+
+  activeTimerIndex = nextIndex;
 }
 
-function tick() {
-  if (!isRunning) return;
-  const now = Date.now();
-  const delta = now - lastTick;
-  lastTick = now;
-  baseElapsed += delta;
+function finishSequence() {
+  ticker.stop();
+  running = false;
+  activeTimerIndex = null;
+  timers.forEach((timer) => timer.lockInputs(false));
+  updateToggleButton();
+}
 
-  if (direction === 'down') {
-    const remaining = getCountdownStartMs() - baseElapsed;
-    if (remaining <= 0) {
-      baseElapsed = getCountdownStartMs();
-      countdownCompleted = true;
-      stopTimer();
-      display.textContent = '00 : 00';
-      createToast("Time's up!", { variant: 'default', timeout: 3000 });
-      return;
+function initializeSequence() {
+  let hasDuration = false;
+  timers.forEach((timer) => {
+    const duration = timer.captureDuration();
+    if (duration > 0) {
+      hasDuration = true;
     }
+  });
+
+  if (!hasDuration) {
+    createToast('Set a duration for at least one timer.', { variant: 'error' });
+    return false;
   }
 
-  updateDisplay();
+  activeTimerIndex = timers.findIndex((timer) => timer.duration > 0);
+  timers.forEach((timer) => timer.lockInputs(true));
+  return true;
 }
 
-function startTimer() {
-  if (direction === 'down') {
-    const countdownMs = getCountdownStartMs();
-    if (countdownMs === 0) {
-      createToast('Set a countdown duration first.', { variant: 'error' });
-      return;
-    }
-
-    if (countdownCompleted || baseElapsed >= countdownMs) {
-      baseElapsed = 0;
-      countdownCompleted = false;
-      updateDisplay();
-    }
+function startSequence() {
+  const initialized = initializeSequence();
+  if (!initialized) {
+    return;
   }
 
-  if (isRunning) return;
-  isRunning = true;
-  startStopButton.textContent = 'Pause';
-  startStopButton.classList.add('button--running');
-  lastTick = Date.now();
-  timerId = setInterval(tick, 200);
+  running = true;
+  updateToggleButton();
+  ticker.start();
 }
 
-function stopTimer() {
-  if (timerId) {
-    clearInterval(timerId);
-    timerId = null;
-  }
-
-  if (isRunning) {
-    isRunning = false;
-  }
-
-  startStopButton.textContent = 'Start';
-  startStopButton.classList.remove('button--running');
+function stopSequence() {
+  ticker.stop();
+  running = false;
+  activeTimerIndex = null;
+  timers.forEach((timer) => {
+    timer.lockInputs(false);
+    timer.resetToInputs();
+  });
+  updateToggleButton();
 }
 
-function toggleDirection() {
-  const countdownMs = getCountdownStartMs();
-  const wasRunning = isRunning;
-  stopTimer();
-
-  if (direction === 'up') {
-    direction = 'down';
-    modeLabel.textContent = 'Counting down';
-    directionButton.textContent = 'Switch to Count Up';
-    directionButton.setAttribute('aria-pressed', 'true');
-    baseElapsed = 0;
-    countdownCompleted = false;
-    display.textContent = formatTime(countdownMs);
+function updateToggleButton() {
+  if (running) {
+    sequenceToggle.textContent = 'Stop';
+    sequenceToggle.classList.add('button--running');
   } else {
-    direction = 'up';
-    modeLabel.textContent = 'Counting up';
-    directionButton.textContent = 'Switch to Countdown';
-    directionButton.setAttribute('aria-pressed', 'false');
-    countdownCompleted = false;
-    display.textContent = formatTime(baseElapsed);
-  }
-
-  if (wasRunning) {
-    startTimer();
+    sequenceToggle.textContent = 'Start';
+    sequenceToggle.classList.remove('button--running');
   }
 }
 
-function normalizeInputs() {
-  const minutes = clamp(Number.parseInt(minutesInput.value, 10) || 0, 0, 599);
-  const seconds = clamp(Number.parseInt(secondsInput.value, 10) || 0, 0, 59);
-  const total = minutes * 60 + seconds;
-  setCountdownInputs(total * 1000);
-  countdownCompleted = false;
-  if (direction === 'down' && !isRunning) {
-    updateDisplay();
-  }
-}
-
-startStopButton.addEventListener('click', () => {
-  if (isRunning) {
-    stopTimer();
+sequenceToggle.addEventListener('click', () => {
+  if (running) {
+    stopSequence();
   } else {
-    startTimer();
+    startSequence();
   }
 });
 
-resetButton.addEventListener('click', () => {
-  baseElapsed = 0;
-  countdownCompleted = false;
-  if (direction === 'down') {
-    updateDisplay();
-  } else {
-    display.textContent = formatTime(0);
-  }
-  stopTimer();
-});
-
-directionButton.addEventListener('click', toggleDirection);
-
-minutesInput.addEventListener('change', normalizeInputs);
-secondsInput.addEventListener('change', normalizeInputs);
-minutesInput.addEventListener('input', normalizeInputs);
-secondsInput.addEventListener('input', normalizeInputs);
-
-// Initialize display
-updateDisplay();
+updateToggleButton();

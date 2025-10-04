@@ -16,54 +16,92 @@
     <main class="app">
       <header class="app__header">
         <h1 class="app__title">TempTimer</h1>
-        <p class="app__subtitle">A simple up &amp; down count timer</p>
+        <p class="app__subtitle">Dual countdown timers for heat up and cool down</p>
       </header>
 
-      <section class="timer" aria-live="polite">
-        <div class="timer__mode" role="status">
-          <span id="modeLabel">Counting up</span>
-        </div>
-        <div class="timer__display" id="timeDisplay" aria-label="Timer">
-          00 : 00
-        </div>
+      <section class="timers" aria-label="Countdown timers">
+        <article class="timer-card" aria-live="polite">
+          <header class="timer-card__header">
+            <h2 class="timer-card__title">Heat Up</h2>
+            <p class="timer-card__subtitle">Countdown while things warm up</p>
+          </header>
+          <div class="timer-card__display" id="heatDisplay" aria-label="Heat up timer">
+            01 : 00
+          </div>
+          <div class="timer-card__inputs" aria-label="Heat up duration inputs">
+            <label class="timer-card__field" for="heatMinutes">
+              <span class="controls__label">Minutes</span>
+              <input
+                id="heatMinutes"
+                class="controls__input"
+                type="number"
+                min="0"
+                max="599"
+                value="1"
+                inputmode="numeric"
+              />
+            </label>
+            <label class="timer-card__field" for="heatSeconds">
+              <span class="controls__label">Seconds</span>
+              <input
+                id="heatSeconds"
+                class="controls__input"
+                type="number"
+                min="0"
+                max="59"
+                value="0"
+                inputmode="numeric"
+              />
+            </label>
+          </div>
+        </article>
+
+        <article class="timer-card" aria-live="polite">
+          <header class="timer-card__header">
+            <h2 class="timer-card__title">Cool Down</h2>
+            <p class="timer-card__subtitle">Countdown while you cool</p>
+          </header>
+          <div
+            class="timer-card__display"
+            id="coolDisplay"
+            aria-label="Cool down timer"
+          >
+            01 : 00
+          </div>
+          <div class="timer-card__inputs" aria-label="Cool down duration inputs">
+            <label class="timer-card__field" for="coolMinutes">
+              <span class="controls__label">Minutes</span>
+              <input
+                id="coolMinutes"
+                class="controls__input"
+                type="number"
+                min="0"
+                max="599"
+                value="1"
+                inputmode="numeric"
+              />
+            </label>
+            <label class="timer-card__field" for="coolSeconds">
+              <span class="controls__label">Seconds</span>
+              <input
+                id="coolSeconds"
+                class="controls__input"
+                type="number"
+                min="0"
+                max="59"
+                value="0"
+                inputmode="numeric"
+              />
+            </label>
+          </div>
+        </article>
       </section>
 
-      <section class="controls" aria-label="Timer controls">
-        <div class="controls__group">
-          <label class="controls__label" for="minutesInput">Minutes</label>
-          <input
-            id="minutesInput"
-            class="controls__input"
-            type="number"
-            min="0"
-            max="599"
-            value="1"
-            inputmode="numeric"
-          />
-        </div>
-        <div class="controls__group">
-          <label class="controls__label" for="secondsInput">Seconds</label>
-          <input
-            id="secondsInput"
-            class="controls__input"
-            type="number"
-            min="0"
-            max="59"
-            value="0"
-            inputmode="numeric"
-          />
-        </div>
-      </section>
-
-      <div class="buttons">
-        <button class="button button--primary" id="startStopButton" type="button">
+      <section class="sequence-controls" aria-label="Timer controls">
+        <button class="button button--primary" id="sequenceToggle" type="button">
           Start
         </button>
-        <button class="button" id="resetButton" type="button">Reset</button>
-        <button class="button" id="directionButton" type="button" aria-pressed="false">
-          Switch to Countdown
-        </button>
-      </div>
+      </section>
     </main>
 
     <template id="toastTemplate">
