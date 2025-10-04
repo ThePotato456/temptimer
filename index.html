@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TempTimer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="app__header">
+        <h1 class="app__title">TempTimer</h1>
+        <p class="app__subtitle">Dual countdown timers for heat up and cool down</p>
+      </header>
+
+      <section class="timers" aria-label="Countdown timers">
+        <article class="timer-card" aria-live="polite">
+          <header class="timer-card__header">
+            <h2 class="timer-card__title">Heat Up</h2>
+            <p class="timer-card__subtitle">Countdown while things warm up</p>
+          </header>
+          <div class="timer-card__display" id="heatDisplay" aria-label="Heat up timer">
+            01 : 00
+          </div>
+          <div class="timer-card__inputs" aria-label="Heat up duration inputs">
+            <label class="timer-card__field" for="heatMinutes">
+              <span class="controls__label">Minutes</span>
+              <input
+                id="heatMinutes"
+                class="controls__input"
+                type="number"
+                min="0"
+                max="599"
+                value="1"
+                inputmode="numeric"
+              />
+            </label>
+            <label class="timer-card__field" for="heatSeconds">
+              <span class="controls__label">Seconds</span>
+              <input
+                id="heatSeconds"
+                class="controls__input"
+                type="number"
+                min="0"
+                max="59"
+                value="0"
+                inputmode="numeric"
+              />
+            </label>
+          </div>
+        </article>
+
+        <article class="timer-card" aria-live="polite">
+          <header class="timer-card__header">
+            <h2 class="timer-card__title">Cool Down</h2>
+            <p class="timer-card__subtitle">Countdown while you cool</p>
+          </header>
+          <div
+            class="timer-card__display"
+            id="coolDisplay"
+            aria-label="Cool down timer"
+          >
+            01 : 00
+          </div>
+          <div class="timer-card__inputs" aria-label="Cool down duration inputs">
+            <label class="timer-card__field" for="coolMinutes">
+              <span class="controls__label">Minutes</span>
+              <input
+                id="coolMinutes"
+                class="controls__input"
+                type="number"
+                min="0"
+                max="599"
+                value="1"
+                inputmode="numeric"
+              />
+            </label>
+            <label class="timer-card__field" for="coolSeconds">
+              <span class="controls__label">Seconds</span>
+              <input
+                id="coolSeconds"
+                class="controls__input"
+                type="number"
+                min="0"
+                max="59"
+                value="0"
+                inputmode="numeric"
+              />
+            </label>
+          </div>
+        </article>
+      </section>
+
+      <section class="sequence-controls" aria-label="Timer controls">
+        <button class="button button--primary" id="sequenceToggle" type="button">
+          Start
+        </button>
+      </section>
+    </main>
+
+    <template id="toastTemplate">
+      <div class="toast" role="status" aria-live="assertive"></div>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
