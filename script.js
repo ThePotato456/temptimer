@@ -84,7 +84,7 @@ function createTicker(callback) {
   };
 }
 
-function createCountdownTimer({ display, minuteInput, secondInput, completionMessage }) {
+function createCountdownTimer({ display, minuteInput, secondInput, completionMessage, addTimeButton }) {
   let duration = 0;
   let remaining = 0;
   let inputsLocked = false;
@@ -123,12 +123,22 @@ function createCountdownTimer({ display, minuteInput, secondInput, completionMes
     onInputChange();
   }
 
+  function addTime() {
+    if (!inputsLocked) return;
+    remaining += 5000;
+    updateDisplay();
+  }
+
   minuteInput.addEventListener('input', onInputChange);
   secondInput.addEventListener('input', onInputChange);
   minuteInput.addEventListener('change', onInputChange);
   secondInput.addEventListener('change', onInputChange);
   minuteInput.addEventListener('wheel', (e) => onWheel(e, minuteInput, 0, 599), { passive: false });
   secondInput.addEventListener('wheel', (e) => onWheel(e, secondInput, 0, 59), { passive: false });
+
+  if (addTimeButton) {
+    addTimeButton.addEventListener('click', addTime);
+  }
 
   syncFromInputs();
 
@@ -153,6 +163,9 @@ function createCountdownTimer({ display, minuteInput, secondInput, completionMes
       inputsLocked = locked;
       minuteInput.disabled = locked;
       secondInput.disabled = locked;
+      if (addTimeButton) {
+        addTimeButton.disabled = !locked;
+      }
     },
     get duration() {
       return duration;
@@ -165,6 +178,7 @@ const heatTimer = createCountdownTimer({
   display: document.getElementById('heatDisplay'),
   minuteInput: document.getElementById('heatMinutes'),
   secondInput: document.getElementById('heatSeconds'),
+  addTimeButton: null,
   completionMessage: 'Heat up complete! Starting cool down.',
 });
 
@@ -172,6 +186,7 @@ const coolTimer = createCountdownTimer({
   display: document.getElementById('coolDisplay'),
   minuteInput: document.getElementById('coolMinutes'),
   secondInput: document.getElementById('coolSeconds'),
+  addTimeButton: document.getElementById('coolAddTime'),
   completionMessage: 'Cool down complete! All done.',
 });
 

@@ -93,6 +93,33 @@ body {
   text-align: center;
 }
 
+.timer-card__add-time {
+  cursor: pointer;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: transform 0.15s ease, background 0.2s ease;
+  margin: 0 auto;
+  display: block;
+}
+
+.timer-card__add-time:hover,
+.timer-card__add-time:focus-visible {
+  transform: translateY(-2px);
+  background: rgb(255 255 255 / 0.1);
+  outline: none;
+}
+
+.timer-card__add-time:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .timer-card__inputs {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
