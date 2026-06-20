@@ -1,1 +1,10 @@
-test.sh
+.DS_Store
+Thumbs.db
+
+node_modules/
+dist/
+build/
+
+*.log
+.env
+.env.*

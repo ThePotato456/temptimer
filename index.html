@@ -3,6 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="TempTimer is a lightweight dual countdown timer for heat up and cool down intervals."
+    />
+    <meta name="theme-color" content="#101322" />
     <title>TempTimer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -68,7 +73,13 @@
           >
             01 : 00
           </div>
-          <button class="timer-card__add-time" id="coolAddTime" type="button" aria-label="Add 5 seconds to cool down timer">
+          <button
+            class="timer-card__add-time"
+            id="coolAddTime"
+            type="button"
+            aria-label="Add 5 seconds to cool down timer"
+            disabled
+          >
             +5s
           </button>
           <div class="timer-card__inputs" aria-label="Cool down duration inputs">
@@ -117,6 +128,10 @@
       <div class="toast" role="status" aria-live="assertive"></div>
     </template>
 
-    <script src="script.js"></script>
+    <noscript>
+      <p class="noscript-message">TempTimer requires JavaScript to run.</p>
+    </noscript>
+
+    <script src="script.js" defer></script>
   </body>
 </html>

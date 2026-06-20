@@ -237,6 +237,18 @@ body {
   animation: toast-out 0.2s ease forwards;
 }
 
+.noscript-message {
+  position: fixed;
+  inset: auto 1rem 1rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: rgb(127 29 29 / 0.95);
+  color: #fef2f2;
+  font-weight: 600;
+  text-align: center;
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;

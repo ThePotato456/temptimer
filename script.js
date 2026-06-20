@@ -1,6 +1,3 @@
-+267
--0
-
 const toastTemplate = document.getElementById('toastTemplate');
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
